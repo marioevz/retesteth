@@ -35,16 +35,16 @@ size_t ThreadManager::getMaxAllowedThreads()
 
 void ThreadManager::addTask(std::function<void()> _job)
 {
-    {
-         std::lock_guard<std::mutex> lk(g_jobsmutex);
-         g_activejobs++;
-    }
+//    {
+//         std::lock_guard<std::mutex> lk(g_jobsmutex);
+//         g_activejobs++;
+//    }
 
     auto wrappedJob = [_job](){
         _job();
-        g_cv.notify_one();
-        std::lock_guard<std::mutex> lk(g_jobsmutex);
-        g_activejobs--;
+//        g_cv.notify_one();
+//        std::lock_guard<std::mutex> lk(g_jobsmutex);
+//        g_activejobs--;
     };
     thread workThread(wrappedJob);
     threadMap.emplace(workThread.get_id(), std::move(workThread));
@@ -61,7 +61,7 @@ void ThreadManager::addTask(std::function<void()> _job)
     // Wait for at least one connection to finish it's task
     if (threadMap.size() == maxAllowedThreads)
     {
-        waitForAtLeastOneJobToFinish();
+//        waitForAtLeastOneJobToFinish();
         joinThreads(false);
     }
 }
