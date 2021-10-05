@@ -73,8 +73,6 @@ void TransactionAccessList::fromDataObject(DataObject const& _data)
         else
         {
             m_v = spVALUE(new VALUE(_data.atKey("v")));
-            if (m_v.getCContent() > dev::bigint("0xff"))
-                throw test::UpwardsException("Incorrect transaction `v` value: " + m_v->asString());
             m_r = spVALUE(new VALUE(_data.atKey("r")));
             m_s = spVALUE(new VALUE(_data.atKey("s")));
             rebuildRLP();
@@ -163,19 +161,14 @@ void TransactionAccessList::streamHeader(dev::RLPStream& _s) const
 {
     // rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])
     _s << VALUE(1).asBigInt();
-    _s << nonce().asBigInt();
-    _s << gasPrice().asBigInt();
-    _s << gasLimit().asBigInt();
+    _s << nonce().serializeRLP();
+    _s << gasPrice().serializeRLP();
+    _s << gasLimit().serializeRLP();
     if (Transaction::isCreation())
         _s << "";
     else
-    {
-        if (to().isBigInt())
-            _s << to().asBigInt();
-        else
-            _s << test::sfromHex(to().asString(ExportType::RLP));
-    }
-    _s << value().asBigInt();
+        _s << to().serializeRLP();
+    _s << value().serializeRLP();
     _s << test::sfromHex(data().asString());
 
     // Access Listist
@@ -211,9 +204,12 @@ void TransactionAccessList::rebuildRLP()
     dev::RLPStream out;
     out.appendList(11);
     streamHeader(out);
-    out << v().asBigInt().convert_to<dev::byte>();
-    out << r().asBigInt();
-    out << s().asBigInt();
+    if (v().isBigInt())
+        out << v().serializeRLP();
+    else
+        out << v().asBigInt().convert_to<dev::byte>();
+    out << r().serializeRLP();
+    out << s().serializeRLP();
 
     // Alter output with prefixed 01 byte + tr.rlp
     dev::bytes outa = out.out();
