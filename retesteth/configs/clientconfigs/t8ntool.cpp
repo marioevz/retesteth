@@ -33,6 +33,7 @@ string const t8ntool_config = R"({
       "NonceTooLong" : "rlp: input string too long for uint64, decoding into (types.Transaction)(types.LegacyTx).Nonce",
       "InvalidVRS" : "invalid transaction v, r, s values",
       "InvalidV" : "rlp: expected input string or byte for *big.Int, decoding into (types.Transaction)(types.LegacyTx).V",
+      "InvalidR" : "rlp: expected input string or byte for *big.Int, decoding into (types.Transaction)(types.LegacyTx).R",
       "InvalidS" : "rlp: expected input string or byte for *big.Int, decoding into (types.Transaction)(types.LegacyTx).S",
       "InvalidChainID" : "invalid chain id for signer",
       "ECRecoveryFail" : "recovery failed",
